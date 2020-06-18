@@ -1,4 +1,5 @@
 import pymysql
+import time
 
 class DB:
     def __init__(self, host='127.0.0.1', port=3306, db='lianjia', user='root', passwd='root', charset='utf8'):
@@ -20,20 +21,47 @@ class DB:
         self.conn.close()
 
 
-def getCities(cityName):
+def getCityId(cityName):
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
         sql = "select * from cities where name=%s"
         db.execute(sql, (cityName + '市'))
 
-        for i in db:
-            print(i['id'])
+    city = db.fetchone()
 
-    return i['id']
+    return city['id']
 
 
 def insetBorderIntoDistrict(sql):
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
         db.execute(sql)
+
+
+## 获取某个市下面的区
+def getDistricts(city):
+    cityId = getCityId(city)
+
+    sql = "SELECT * FROM districts WHERE city_id={}"
+    sql = sql.format(cityId)
+
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        db.execute(sql)
+
+    return db.fetchall()
+
+
+## 插入房价数据
+def insertIntoHousePrices(ret, cityId):
+    now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        if ret is not None:
+            for i in ret:
+                print(i['name'])
+                db.execute("SELECT * FROM house_prices WHERE `sign`={}".format(i['id']))
+                res = db.fetchall()
+                if (len(res) == 0):
+                    sql = "INSERT INTO house_prices (`type`, `name`, `city_id`, `sign`, `baidu_lng`, `baidu_lat`, `unit_price`, `count`, `created_at`, `updated_at`) values (1, '{}', {}, {}, '{}', '{}', {}, {}, {}, {})"
+                    sql = sql.format(i['name'], cityId, i['id'], i['longitude'], i['latitude'], i['unit_price'], i['count'], now, now)
+                    db.execute(sql)
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ import hashlib
 import params
 import pymysql
 import DB
+import random
 
 sql_InsertDetailInfo = '''insert into %s(houseId,houseCode,title,appid,source,imgSrc,layoutImgSrc,imgSrcUri,layoutImgSrcUri,roomNum,square,buildingArea,buildYear,isNew,ctime,mtime,orientation,floorStat,totalFloor,decorateType,hbtName,isYezhuComment,isGarage,houseType,isFocus,status,isValid,signTime,signSource,signSourceCn,isDisplay,address,community,communityId,communityName,communityUrl,communityUrlEsf,districtId,districtUrl,districtName,regionId,regionUrl,regionName,bbdName,bbdUrl,houseCityId,subwayInfo,schoolName,schoolArr,bizcircleFullSpell,house_video_info,price,unitPrice,viewUrl,listPrice,publishTime,isVilla,villaNoFloorLevel,villaName,tags)values(:houseId,:houseCode,:title,:appid,:source,:imgSrc,:layoutImgSrc,:imgSrcUri,:layoutImgSrcUri,:roomNum,:square,:buildingArea,:buildYear,:isNew,:ctime,:mtime,:orientation,:floorStat,:totalFloor,:decorateType,:hbtName,:isYezhuComment,:isGarage,:houseType,:isFocus,:status,:isValid,:signTime,:signSource,:signSourceCn,:isDisplay,:address,:community,:communityId,:communityName,:communityUrl,:communityUrlEsf,:districtId,:districtUrl,:districtName,:regionId,:regionUrl,:regionName,:bbdName,:bbdUrl,:houseCityId,:subwayInfo,:schoolName,:schoolArr,:bizcircleFullSpell,:house_video_info,:price,:unitPrice,:viewUrl,:listPrice,:publishTime,:isVilla,:villaNoFloorLevel,:villaName,:tags)'''
 sql_CreateDetailInfo = '''create table %s (houseId PRIMARY  KEY 
@@ -32,6 +33,7 @@ class Lianjia():
         self.url = params.url
         self.cookies = params.cookies
         self.headers = params.headers
+        self.proxies = params.proxies
 
     def GetMD5(self, string_):
         m = hashlib.md5()
@@ -54,10 +56,16 @@ class Lianjia():
     def GetDistrictInfo(self) -> list:
         time_13 = int(round(time.time() * 1000))
         authorization = Lianjia(self.city).GetAuthorization(
-            {'group_type': 'district', 'city_id': self.city_id, 'max_lat': self.city_dict[self.city]['max_lat'],
-             'min_lat': self.city_dict[self.city]['min_lat'],
-             'max_lng': self.city_dict[self.city]['max_lng'], 'min_lng': self.city_dict[self.city]['min_lng'],
-             'request_ts': time_13})
+            {
+                'group_type': 'district',
+                'city_id': self.city_id,
+                'max_lat': self.city_dict[self.city]['max_lat'],
+                'min_lat': self.city_dict[self.city]['min_lat'],
+                'max_lng': self.city_dict[self.city]['max_lng'],
+                'min_lng': self.city_dict[self.city]['min_lng'],
+                'request_ts': time_13
+            }
+        )
 
         url = self.url % (
             self.city_id, 'district', self.city_dict[self.city]['max_lat'], self.city_dict[self.city]['min_lat'],
@@ -65,7 +73,7 @@ class Lianjia():
             authorization, time_13)
 
         with requests.Session() as sess:
-            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies)
+            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies, proxies=self.proxies)
 
             house_json = json.loads(ret.text[43:-1])
 
@@ -117,8 +125,16 @@ class Lianjia():
     def GetCommunityInfo(self, max_lat, min_lat, max_lng, min_lng) -> list:
         time_13 = int(round(time.time() * 1000))
         authorization = Lianjia(self.city).GetAuthorization(
-            {'group_type': 'community', 'city_id': self.city_id, 'max_lat': max_lat, 'min_lat': min_lat,
-             'max_lng': max_lng, 'min_lng': min_lng, 'request_ts': time_13})
+            {
+                'group_type': 'community',
+                'city_id': self.city_id,
+                'max_lat': max_lat,
+                'min_lat': min_lat,
+                'max_lng': max_lng,
+                'min_lng': min_lng,
+                'request_ts': time_13
+            }
+        )
 
         url = self.url % (
             self.city_id, 'community', max_lat, min_lat, max_lng, min_lng, '%7B%7D', time_13, authorization, time_13)
@@ -140,10 +156,10 @@ class Lianjia():
                 return None
 
 
-
-def saveCityBorderIntoDB(city):
+## 保存城市区的边界
+def saveDistrictBorderIntoDB(city):
     ret = Lianjia(city).GetDistrictInfo()
-    cityId = DB.getCities(city)
+    cityId = DB.getCityId(city)
     pbar = tqdm.tqdm(ret)
 
     for x in pbar:
@@ -157,34 +173,16 @@ def saveCityBorderIntoDB(city):
             pbar.set_description(x['name'] + '导入失败')
 
 
-
+# 获取在区里面商圈的二手房价格
 def saveBizcircleIntoDB(city):
-    with sqlite3.connect('district.db') as conn:
-        c = conn.cursor()
-        c.execute('SELECT border,name FROM %s' % city)
-        area_list = c.fetchall()
+    cityId = DB.getCityId(city)
+    areaList = DB.getDistricts(city)
 
-    conn = sqlite3.connect('biz_circle.db')
-    cursor = conn.cursor()
-    try:
-        sql = '''create table %s (
-                        id int PRIMARY KEY ,
-                        name text,
-                        district text,
-                        longitude text,
-                        latitude text,
-                        unit_price int,
-                        count int
-                        )
-            ''' % city
-        cursor.execute(sql)
-    except:
-        pass
-    for x in area_list:
+    for x in areaList:
+        print(x['name'])
         lat = []
         lng = []
-        district = x[1]
-        for y in x[0].split(';'):
+        for y in x['border'].split(';'):
             lng.append(float(y.split(',')[0]))
             lat.append(float(y.split(',')[1]))
         li = []
@@ -195,28 +193,16 @@ def saveBizcircleIntoDB(city):
         pbar = tqdm.tqdm(li)
 
         for x in pbar:
+            try:
+                ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3])
+                DB.insertIntoHousePrices(ret, cityId)
+            except:
+                pass
 
-            ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3])
-
-            if ret is not None:
-                for z in ret:
-                    try:
-                        sql = ''' insert into %s
-                                 (id, name, district,longitude,latitude,unit_price,count)
-                                 values
-                                 (:id, :name, :district,:longitude, :latitude, :unit_price, :count)
-                                 ''' % city
-                        z.update({'district': district})
-                        cursor.execute(sql, z)
-                        conn.commit()
-
-                        pbar.set_description(city + z['name'] + '已导入')
-                    except:
-                        pbar.set_description(city + z['name'] + '商圈已存在')
 
 
 if __name__ == '__main__':
     city = '杭州'
-    saveCityBorderIntoDB(city)
+    # saveDistrictBorderIntoDB(city)
     # saveBizcircleIntoDB(city)  # 下载城市区域数据
 

@@ -1,6 +1,7 @@
 import pymysql
 import time
 
+
 class DB:
     def __init__(self, host='127.0.0.1', port=3306, db='lianjia', user='root', passwd='root', charset='utf8'):
         # 建立连接
@@ -21,22 +22,35 @@ class DB:
         self.conn.close()
 
 
+# 获取城市信息
+def getCityInfo(cityName):
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        sql = "select * from cities where name=%s OR name=%s"
+        db.execute(sql, (cityName + '市', cityName + '州'))
+
+    city = db.fetchone()
+
+    return city
+
+
+# 获取城市id
 def getCityId(cityName):
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
-        sql = "select * from cities where name=%s"
-        db.execute(sql, (cityName + '市'))
+        sql = "select * from cities where name=%s OR name=%s"
+        db.execute(sql, (cityName + '市', cityName + '州'))
 
     city = db.fetchone()
 
     return city['id']
 
 
+# 插入区的边界经纬度
 def insetBorderIntoDistrict(sql):
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
         db.execute(sql)
 
 
-## 获取某个市下面的区
+# 获取某个市下面的区
 def getDistricts(city):
     cityId = getCityId(city)
 
@@ -49,7 +63,7 @@ def getDistricts(city):
     return db.fetchall()
 
 
-## 插入房价数据
+# 插入房价数据
 def insertIntoHousePrices(ret, cityId):
     now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:

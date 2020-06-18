@@ -111,7 +111,7 @@ class Lianjia():
         )
 
         with requests.Session() as sess:
-            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies)
+            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies, proxies=self.proxies)
 
             house_json = json.loads(ret.text[43:-1])
 

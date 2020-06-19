@@ -1,5 +1,6 @@
 import pymysql
 import time
+import GD
 
 
 class DB:
@@ -33,6 +34,15 @@ def getCityInfo(cityName):
     return city
 
 
+# 获取所有有边界的区
+def getDistricts():
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        sql = "select * from districts where border is not null"
+        db.execute(sql)
+
+    return db.fetchall()
+
+
 # 获取城市id
 def getCityId(cityName):
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
@@ -54,7 +64,7 @@ def insetBorderIntoDistrict(sql):
 def getDistricts(city):
     cityId = getCityId(city)
 
-    sql = "SELECT * FROM districts WHERE city_id={}"
+    sql = "SELECT * FROM districts WHERE city_id={} AND border IS NOT NULL"
     sql = sql.format(cityId)
 
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
@@ -63,8 +73,19 @@ def getDistricts(city):
     return db.fetchall()
 
 
+# 获取区
+def getDistrictByName(cityId, districtName):
+    sql = "SELECT * FROM districts WHERE city_id={} AND (name='{}' OR name='{}')"
+    sql = sql.format(cityId, districtName + '区', districtName + '县')
+
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        db.execute(sql)
+
+    return db.fetchone()
+
+
 # 插入房价数据
-def insertIntoHousePrices(ret, cityId):
+def insertIntoHousePrices(ret, city):
     now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
         if ret is not None:
@@ -73,9 +94,31 @@ def insertIntoHousePrices(ret, cityId):
                 db.execute("SELECT * FROM house_prices WHERE `sign`={}".format(i['id']))
                 res = db.fetchall()
                 if (len(res) == 0):
-                    sql = "INSERT INTO house_prices (`type`, `name`, `city_id`, `sign`, `baidu_lng`, `baidu_lat`, `unit_price`, `count`, `created_at`, `updated_at`) values (1, '{}', {}, {}, '{}', '{}', {}, {}, {}, {})"
-                    sql = sql.format(i['name'], cityId, i['id'], i['longitude'], i['latitude'], i['unit_price'], i['count'], now, now)
+                    sql = "INSERT INTO house_prices (`type`, `name`, `city_id`, `city_name`, `sign`, `baidu_lng`, `baidu_lat`, `unit_price`, `count`, `created_at`, `updated_at`) values (1, '{}', {}, '{}', {}, '{}', '{}', {}, {}, '{}', '{}')"
+                    sql = sql.format(i['name'], city['id'], city['name'], i['id'], i['longitude'], i['latitude'], i['unit_price'], i['count'], now, now)
                     db.execute(sql)
+
+
+# 转换高德经纬度
+def changeBaiduToGaode():
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        db.execute("SELECT * FROM house_prices WHERE gaode_lat IS NULL")
+
+    res = db.fetchall()
+
+    count = 0
+    for i in res:
+        location = GD.getGaodeLocation(i['baidu_lat'], i['baidu_lng'])
+        locationList = location.split(',')
+
+        with DB() as db:
+            sql = "UPDATE house_prices SET gaode_lng='{}', gaode_lat='{}' WHERE id={}"
+            sql = sql.format(locationList[0], locationList[1], i['id'])
+            db.execute(sql)
+
+        # time.sleep(0.5)
+        count += 1
+        print(count)
 
 
 if __name__ == '__main__':

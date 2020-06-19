@@ -2,14 +2,10 @@ import requests
 import time
 import tqdm
 import json
-import sqlite3
 import numpy
-import math
 import hashlib
 import params
-import pymysql
 import DB
-import random
 
 sql_InsertDetailInfo = '''insert into %s(houseId,houseCode,title,appid,source,imgSrc,layoutImgSrc,imgSrcUri,layoutImgSrcUri,roomNum,square,buildingArea,buildYear,isNew,ctime,mtime,orientation,floorStat,totalFloor,decorateType,hbtName,isYezhuComment,isGarage,houseType,isFocus,status,isValid,signTime,signSource,signSourceCn,isDisplay,address,community,communityId,communityName,communityUrl,communityUrlEsf,districtId,districtUrl,districtName,regionId,regionUrl,regionName,bbdName,bbdUrl,houseCityId,subwayInfo,schoolName,schoolArr,bizcircleFullSpell,house_video_info,price,unitPrice,viewUrl,listPrice,publishTime,isVilla,villaNoFloorLevel,villaName,tags)values(:houseId,:houseCode,:title,:appid,:source,:imgSrc,:layoutImgSrc,:imgSrcUri,:layoutImgSrcUri,:roomNum,:square,:buildingArea,:buildYear,:isNew,:ctime,:mtime,:orientation,:floorStat,:totalFloor,:decorateType,:hbtName,:isYezhuComment,:isGarage,:houseType,:isFocus,:status,:isValid,:signTime,:signSource,:signSourceCn,:isDisplay,:address,:community,:communityId,:communityName,:communityUrl,:communityUrlEsf,:districtId,:districtUrl,:districtName,:regionId,:regionUrl,:regionName,:bbdName,:bbdUrl,:houseCityId,:subwayInfo,:schoolName,:schoolArr,:bizcircleFullSpell,:house_video_info,:price,:unitPrice,:viewUrl,:listPrice,:publishTime,:isVilla,:villaNoFloorLevel,:villaName,:tags)'''
 sql_CreateDetailInfo = '''create table %s (houseId PRIMARY  KEY 
@@ -175,8 +171,8 @@ def saveDistrictBorderIntoDB(city):
 
 # 获取在区里面商圈的二手房价格
 def saveBizcircleIntoDB(city):
-    cityId = DB.getCityId(city)
     areaList = DB.getDistricts(city)
+    cityInfo = DB.getCityInfo(city)
 
     for x in areaList:
         print(x['name'])
@@ -186,7 +182,7 @@ def saveBizcircleIntoDB(city):
             lng.append(float(y.split(',')[0]))
             lat.append(float(y.split(',')[1]))
         li = []
-        step = 0.02
+        step = 0.1
         for x in numpy.arange(min(lng), max(lng), step):
             for y in numpy.arange(min(lat), max(lat), step):
                 li.append((round(y, 6), round(y - step, 6), round(x, 6), round(x - step, 6)))
@@ -195,14 +191,35 @@ def saveBizcircleIntoDB(city):
         for x in pbar:
             try:
                 ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3])
-                DB.insertIntoHousePrices(ret, cityId)
+                time.sleep(0.1)
+                DB.insertIntoHousePrices(ret, cityInfo)
             except:
                 pass
 
 
+# 获取一个区内的所有商圈
+def getDistrictBizCircle(city, districtName):
+    cityId = DB.getCityId(city)
+    district = DB.getDistrictByName(cityId, districtName)
 
-if __name__ == '__main__':
-    city = '杭州'
-    # saveDistrictBorderIntoDB(city)
-    # saveBizcircleIntoDB(city)  # 下载城市区域数据
+    lat = []
+    lng = []
+    for y in district['border'].split(';'):
+        lng.append(float(y.split(',')[0]))
+        lat.append(float(y.split(',')[1]))
+    li = []
+    step = 0.02
+    for x in numpy.arange(min(lng), max(lng), step):
+        for y in numpy.arange(min(lat), max(lat), step):
+            li.append((round(y, 6), round(y - step, 6), round(x, 6), round(x - step, 6)))
+    pbar = tqdm.tqdm(li)
+
+    for x in pbar:
+        try:
+            ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3])
+            for i in ret:
+                print(i)
+        except:
+            pass
+
 

@@ -1,4 +1,6 @@
 numpy
 requests
 tqdm
-pymysql==0.9.3
+pymysql
+lxml
+bs4

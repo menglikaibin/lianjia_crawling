@@ -337,10 +337,75 @@ headers = {
 }
 
 proxies = {
-    '121.225.65.40',
-    '202.115.142.147',
-    '114.103.19.174',
-    '223.241.5.136'
+    'http': '115.206.97.46',
+    'https': '223.247.92.157',
+    # '202.115.142.147',
+    # '114.103.19.174',
+    # '223.241.5.136'
 }
 
 key = '9777f65a7dde829ab293c9db5fdb6ddb'
+
+provinceUrls = {
+    "http://www.anjuke.com/fangjia/anhui/",
+    "http://www.anjuke.com/fangjia/fujian/",
+    "http://www.anjuke.com/fangjia/gansu/",
+    "http://www.anjuke.com/fangjia/guangdong/",
+    "http://www.anjuke.com/fangjia/guangxi/",
+    "http://www.anjuke.com/fangjia/guizhou/",
+    "http://www.anjuke.com/fangjia/hainan/",
+    "http://www.anjuke.com/fangjia/hebei/",
+    "http://www.anjuke.com/fangjia/heilongjiang/",
+    "http://www.anjuke.com/fangjia/henan/",
+    "http://www.anjuke.com/fangjia/hubei/",
+    "http://www.anjuke.com/fangjia/hunan/",
+    "http://www.anjuke.com/fangjia/jiangsu/",
+    "http://www.anjuke.com/fangjia/jiangxi/",
+    "http://www.anjuke.com/fangjia/jilin/",
+    "http://www.anjuke.com/fangjia/liaoning/",
+    "http://www.anjuke.com/fangjia/neimenggu/",
+    "http://www.anjuke.com/fangjia/ningxia/",
+    "http://www.anjuke.com/fangjia/qinghai/",
+    "http://www.anjuke.com/fangjia/shan3xi/",
+    "http://www.anjuke.com/fangjia/shandong/",
+    "http://www.anjuke.com/fangjia/shanxi/",
+    "http://www.anjuke.com/fangjia/sichuan/",
+    "http://www.anjuke.com/fangjia/xinjiang/",
+    "http://www.anjuke.com/fangjia/xizang/",
+    "http://www.anjuke.com/fangjia/yunnan/",
+    "http://www.anjuke.com/fangjia/zhejiang/",
+}
+
+anjukeHeaders = {
+    'Host': 'www.anjuke.com',
+    'Referer': 'https://www.google.com/',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+}
+
+anjukeCookies = {
+    'aQQ_ajkguid': 'C3916F21-95C4-20D0-6A0E-F32C823F8545',
+    '58tj_uuid': '2071f94b-ce16-4b87-8d65-14c04ce46807',
+    'als': '0',
+    'id58': 'e87rkF7LOj+/qxdZA4yfAg==',
+    'isp': 'true',
+    'Hm_lvt_c5899c8768ebee272710c9c5f365a6d8': '1591584748,1591789829',
+    '_ga': 'GA1.2.942347589.1591790560',
+    'sessid': '1A11F698-333D-8690-0D52-89E2640E5768',
+    'lps': 'http%3A%2F%2Fwww.anjuke.com%2F%7Chttps%3A%2F%2Fwww.google.com%2F',
+    'twe': '2',
+    'wmda_new_uuid': '1',
+    'wmda_uuid': '53bd4b15c7c5d713f4cf047169449cc2',
+    'wmda_visited_projects': '%3B6289197098934',
+    'ajk_member_captcha': '65ec74234236d95b48e8af6681cb84ee',
+    'ctid': '75',
+    'wmda_session_id_6289197098934': '1592628931294-34c6f663-4020-a9f5',
+    '__xsptplusUT_8': '1',
+    'new_session': '1',
+    'init_refer': 'https%253A%252F%252Fwww.google.com%252F',
+    'new_uv': '12',
+    '__xsptplus8': '8.11.1592628931.1592628931.1%233%7Cwww.google.com%7C%7C%7C%7C%23%238uddg2f7w7snTu1PSKJw01mvrnlx1Dkp%23',
+    'xxzl_cid': '28e3ee5da25343329010cfb4f86c6217',
+    'xzuid': 'a4690306-64be-4898-9f81-b346697cfece'
+}
+
+

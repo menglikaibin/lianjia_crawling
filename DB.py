@@ -121,5 +121,13 @@ def changeBaiduToGaode():
         print(count)
 
 
+# 插入城市房价
+def insertCityHousePrice(name, price):
+    with DB(host='192.168.0.197', user='LocationApp', passwd='123456', db='linhuiba3.1') as db:
+        sql = "UPDATE cities SET house_price={} WHERE `name` like '%{}%'"
+        sql = sql.format(price, name)
+        db.execute(sql)
+
+
 if __name__ == '__main__':
     insetBorderIntoDistrict('杭州市')

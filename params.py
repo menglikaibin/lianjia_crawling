@@ -1,3 +1,4 @@
+import generateProxy
 
 city_dict = {
     '安庆': {'city_id': '340800', 'max_lat': '30.761368', 'min_lat': '30.310468', 'max_lng': '118.081783',
@@ -336,50 +337,44 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 }
 
-proxies = {
-    'http': '115.206.97.46',
-    'https': '223.247.92.157',
-    # '202.115.142.147',
-    # '114.103.19.174',
-    # '223.241.5.136'
-}
+proxies = generateProxy.generate()
 
 key = '9777f65a7dde829ab293c9db5fdb6ddb'
 
 provinceUrls = {
-    "http://www.anjuke.com/fangjia/anhui/",
-    "http://www.anjuke.com/fangjia/fujian/",
-    "http://www.anjuke.com/fangjia/gansu/",
-    "http://www.anjuke.com/fangjia/guangdong/",
-    "http://www.anjuke.com/fangjia/guangxi/",
-    "http://www.anjuke.com/fangjia/guizhou/",
-    "http://www.anjuke.com/fangjia/hainan/",
-    "http://www.anjuke.com/fangjia/hebei/",
-    "http://www.anjuke.com/fangjia/heilongjiang/",
-    "http://www.anjuke.com/fangjia/henan/",
-    "http://www.anjuke.com/fangjia/hubei/",
-    "http://www.anjuke.com/fangjia/hunan/",
-    "http://www.anjuke.com/fangjia/jiangsu/",
-    "http://www.anjuke.com/fangjia/jiangxi/",
-    "http://www.anjuke.com/fangjia/jilin/",
-    "http://www.anjuke.com/fangjia/liaoning/",
-    "http://www.anjuke.com/fangjia/neimenggu/",
-    "http://www.anjuke.com/fangjia/ningxia/",
-    "http://www.anjuke.com/fangjia/qinghai/",
-    "http://www.anjuke.com/fangjia/shan3xi/",
-    "http://www.anjuke.com/fangjia/shandong/",
-    "http://www.anjuke.com/fangjia/shanxi/",
-    "http://www.anjuke.com/fangjia/sichuan/",
-    "http://www.anjuke.com/fangjia/xinjiang/",
-    "http://www.anjuke.com/fangjia/xizang/",
-    "http://www.anjuke.com/fangjia/yunnan/",
-    "http://www.anjuke.com/fangjia/zhejiang/",
+    "http://www.anjuke.com/fangjia/anhui2020/",
+    "http://www.anjuke.com/fangjia/fujian2020/",
+    "http://www.anjuke.com/fangjia/gansu2020/",
+    "http://www.anjuke.com/fangjia/guangdong2020/",
+    "http://www.anjuke.com/fangjia/guangxi2020/",
+    "http://www.anjuke.com/fangjia/guizhou2020/",
+    "http://www.anjuke.com/fangjia/hainan2020/",
+    "http://www.anjuke.com/fangjia/hebei2020/",
+    "http://www.anjuke.com/fangjia/heilongjiang2020/",
+    "http://www.anjuke.com/fangjia/henan2020/",
+    "http://www.anjuke.com/fangjia/hubei2020/",
+    "http://www.anjuke.com/fangjia/hunan2020/",
+    "http://www.anjuke.com/fangjia/jiangsu2020/",
+    "http://www.anjuke.com/fangjia/jiangxi2020/",
+    "http://www.anjuke.com/fangjia/jilin2020/",
+    "http://www.anjuke.com/fangjia/liaoning2020/",
+    "http://www.anjuke.com/fangjia/neimenggu2020/",
+    "http://www.anjuke.com/fangjia/ningxia2020/",
+    "http://www.anjuke.com/fangjia/qinghai2020/",
+    "http://www.anjuke.com/fangjia/shan3xi2020/",
+    "http://www.anjuke.com/fangjia/shandong2020/",
+    "http://www.anjuke.com/fangjia/shanxi2020/",
+    "http://www.anjuke.com/fangjia/sichuan2020/",
+    "http://www.anjuke.com/fangjia/xinjiang2020/",
+    "http://www.anjuke.com/fangjia/xizang2020/",
+    "http://www.anjuke.com/fangjia/yunnan2020/",
+    "http://www.anjuke.com/fangjia/zhejiang2020/",
 }
 
 anjukeHeaders = {
     'Host': 'www.anjuke.com',
     'Referer': 'https://www.google.com/',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 }
 
 anjukeCookies = {

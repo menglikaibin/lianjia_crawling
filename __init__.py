@@ -16,8 +16,8 @@ import DB
 
 # lj.saveBizcircleIntoDB('杭州')
 
-# lj.getDistrictBizCircle('杭州', '余杭')
+lj.getDistrictBizCircle('杭州', '余杭')
 
 # 转换高德经纬度
-DB.changeBaiduToGaode()
+# DB.changeBaiduToGaode()
 

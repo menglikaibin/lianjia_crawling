@@ -223,3 +223,5 @@ def getDistrictBizCircle(city, districtName):
             pass
 
 
+if __name__ == '__main__':
+    getDistrictBizCircle('杭州', '余杭')

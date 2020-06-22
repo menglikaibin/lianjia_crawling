@@ -1,6 +1,4 @@
 from bs4 import BeautifulSoup
-import lxml
-import requests
 import params
 import DB
 import time

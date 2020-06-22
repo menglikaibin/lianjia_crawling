@@ -14,9 +14,9 @@ import DB
 #     lj.saveBizcircleIntoDB(i)
 #     time.sleep(1)
 
-# lj.saveBizcircleIntoDB('杭州')
+lj.saveBizcircleIntoDB('杭州')
 
-lj.getDistrictBizCircle('杭州', '余杭')
+# lj.getDistrictBizCircle('杭州', '余杭')
 
 # 转换高德经纬度
 # DB.changeBaiduToGaode()

@@ -128,6 +128,21 @@ def insertCityHousePrice(name, price):
         sql = sql.format(price, name)
         db.execute(sql)
 
+# 插入房价数据
+def insertXiaoqu(ret, city):
+    now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+        if ret is not None:
+            for i in ret:
+                print(i['name'])
+                db.execute("SELECT * FROM house_prices WHERE `sign`={}".format(i['id']))
+                res = db.fetchall()
+                if (len(res) == 0):
+                    sql = "INSERT INTO xiaoqu (`type`, `name`, `city_id`, `city_name`, `sign`, `baidu_lng`, `baidu_lat`, `unit_price`, `count`, `created_at`, `updated_at`) values (1, '{}', {}, '{}', {}, '{}', '{}', {}, {}, '{}', '{}')"
+                    sql = sql.format(i['name'], city['id'], city['name'], i['id'], i['longitude'], i['latitude'], i['unit_price'], i['count'], now, now)
+                    db.execute(sql)
+
 
 if __name__ == '__main__':
     insetBorderIntoDistrict('杭州市')

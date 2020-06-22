@@ -6,6 +6,7 @@ import numpy
 import hashlib
 import params
 import DB
+import sys
 
 sql_InsertDetailInfo = '''insert into %s(houseId,houseCode,title,appid,source,imgSrc,layoutImgSrc,imgSrcUri,layoutImgSrcUri,roomNum,square,buildingArea,buildYear,isNew,ctime,mtime,orientation,floorStat,totalFloor,decorateType,hbtName,isYezhuComment,isGarage,houseType,isFocus,status,isValid,signTime,signSource,signSourceCn,isDisplay,address,community,communityId,communityName,communityUrl,communityUrlEsf,districtId,districtUrl,districtName,regionId,regionUrl,regionName,bbdName,bbdUrl,houseCityId,subwayInfo,schoolName,schoolArr,bizcircleFullSpell,house_video_info,price,unitPrice,viewUrl,listPrice,publishTime,isVilla,villaNoFloorLevel,villaName,tags)values(:houseId,:houseCode,:title,:appid,:source,:imgSrc,:layoutImgSrc,:imgSrcUri,:layoutImgSrcUri,:roomNum,:square,:buildingArea,:buildYear,:isNew,:ctime,:mtime,:orientation,:floorStat,:totalFloor,:decorateType,:hbtName,:isYezhuComment,:isGarage,:houseType,:isFocus,:status,:isValid,:signTime,:signSource,:signSourceCn,:isDisplay,:address,:community,:communityId,:communityName,:communityUrl,:communityUrlEsf,:districtId,:districtUrl,:districtName,:regionId,:regionUrl,:regionName,:bbdName,:bbdUrl,:houseCityId,:subwayInfo,:schoolName,:schoolArr,:bizcircleFullSpell,:house_video_info,:price,:unitPrice,:viewUrl,:listPrice,:publishTime,:isVilla,:villaNoFloorLevel,:villaName,:tags)'''
 sql_CreateDetailInfo = '''create table %s (houseId PRIMARY  KEY 
@@ -118,7 +119,7 @@ class Lianjia():
             else:
                 return None
 
-    def GetCommunityInfo(self, max_lat, min_lat, max_lng, min_lng) -> list:
+    def getCommunityInfo(self, max_lat, min_lat, max_lng, min_lng) -> list:
         time_13 = int(round(time.time() * 1000))
         authorization = Lianjia(self.city).GetAuthorization(
             {
@@ -152,7 +153,7 @@ class Lianjia():
                 return None
 
 
-## 保存城市区的边界
+# 保存城市区的边界
 def saveDistrictBorderIntoDB(city):
     ret = Lianjia(city).GetDistrictInfo()
     cityId = DB.getCityId(city)
@@ -223,5 +224,32 @@ def getDistrictBizCircle(city, districtName):
             pass
 
 
+def saveHousePrice(city):
+    areaList = DB.getDistricts(city)
+    cityInfo = DB.getCityInfo(city)
+
+    for x in areaList:
+        lat = []
+        lng = []
+        for y in x['border'].split(';'):
+            lng.append(float(y.split(',')[0]))
+            lat.append(float(y.split(',')[1]))
+        li = []
+        step = 0.02
+        for x in numpy.arange(min(lng), max(lng), step):
+            for y in numpy.arange(min(lat), max(lat), step):
+                li.append((round(y, 6), round(y - step, 6), round(x, 6), round(x - step, 6)))
+        pbar = tqdm.tqdm(li)
+
+        for x in pbar:
+            try:
+                ret = Lianjia(city).getCommunityInfo(x[0], x[1], x[2], x[3])
+                print(ret)
+                time.sleep(0.1)
+                DB.insertXiaoqu(ret, cityInfo)
+            except:
+                pass
+
+
 if __name__ == '__main__':
-    getDistrictBizCircle('杭州', '余杭')
+    saveHousePrice('杭州')

@@ -1,7 +1,13 @@
 import pymysql
 import time
 import GD
+import params
 
+mysqlParams = params.mysqlParams
+host = mysqlParams['host']
+user = mysqlParams['user']
+passwd = mysqlParams['passwd']
+database = mysqlParams['db']
 
 class DB:
     def __init__(self, host='127.0.0.1', port=3306, db='lianjia', user='root', passwd='root', charset='utf8'):
@@ -25,7 +31,7 @@ class DB:
 
 # 获取城市信息
 def getCityInfo(cityName):
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         sql = "select * from cities where name=%s OR name=%s"
         db.execute(sql, (cityName + '市', cityName + '州'))
 
@@ -36,7 +42,7 @@ def getCityInfo(cityName):
 
 # 获取所有有边界的区
 def getDistricts():
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         sql = "select * from districts where border is not null"
         db.execute(sql)
 
@@ -45,7 +51,7 @@ def getDistricts():
 
 # 获取城市id
 def getCityId(cityName):
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         sql = "select * from cities where name=%s OR name=%s"
         db.execute(sql, (cityName + '市', cityName + '州'))
 
@@ -56,7 +62,7 @@ def getCityId(cityName):
 
 # 插入区的边界经纬度
 def insetBorderIntoDistrict(sql):
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         db.execute(sql)
 
 
@@ -67,7 +73,7 @@ def getDistricts(city):
     sql = "SELECT * FROM districts WHERE city_id={} AND border IS NOT NULL"
     sql = sql.format(cityId)
 
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         db.execute(sql)
 
     return db.fetchall()
@@ -78,7 +84,7 @@ def getDistrictByName(cityId, districtName):
     sql = "SELECT * FROM districts WHERE city_id={} AND (name='{}' OR name='{}')"
     sql = sql.format(cityId, districtName + '区', districtName + '县')
 
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         db.execute(sql)
 
     return db.fetchone()
@@ -87,7 +93,7 @@ def getDistrictByName(cityId, districtName):
 # 插入房价数据
 def insertIntoHousePrices(ret, city):
     now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         if ret is not None:
             for i in ret:
                 print(i['name'])
@@ -101,7 +107,7 @@ def insertIntoHousePrices(ret, city):
 
 # 转换高德经纬度
 def changeBaiduToGaode():
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         db.execute("SELECT * FROM house_prices WHERE gaode_lat IS NULL")
 
     res = db.fetchall()
@@ -123,7 +129,7 @@ def changeBaiduToGaode():
 
 # 插入城市房价
 def insertCityHousePrice(name, price):
-    with DB(host='192.168.0.197', user='LocationApp', passwd='123456', db='linhuiba3.1') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         sql = "UPDATE cities SET house_price={} WHERE `name` like '%{}%'"
         sql = sql.format(price, name)
         db.execute(sql)
@@ -132,7 +138,7 @@ def insertCityHousePrice(name, price):
 def insertXiaoqu(ret, city):
     now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-    with DB(host='127.0.0.1', user='root', passwd='root', db='lianjia') as db:
+    with DB(host=host, user=user, passwd=passwd, db=database) as db:
         if ret is not None:
             for i in ret:
                 print(i['name'])

@@ -17,10 +17,11 @@ txt = "orderId=" + orderId + "&" + "secret=" + secret + "&" + "time=" + timestam
 if is_python3:
     txt = txt.encode()
 sign = hashlib.md5(txt).hexdigest()                 # 计算sign
-password = 'orderId=' + orderId + '&time=' + timestamp + '&sign=' + sign + "&pid=-1" + "&cid=-1" + "&uid=" + "&sip=0" + "&nd=1"
+password = 'orderId='+orderId+'&time='+timestamp+'&sign='+sign+"&pid=-1"+"&cid=-1"+"&uid="+"&sip=0"+"&nd=1"
+targetUrl = "http://api.hailiangip.com:8422/api/myIp"
 
 
-def generateProxy():
+def generate():
     proxyUrl = "http://" + user + ":" + password + "@" + host + ":" + port
     proxy = {"http": proxyUrl, "https": proxyUrl}
 
@@ -28,4 +29,4 @@ def generateProxy():
 
 
 if __name__ == '__main__':
-    generateProxy()
+    generate()

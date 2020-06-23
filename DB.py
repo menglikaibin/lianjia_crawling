@@ -100,6 +100,8 @@ def insertIntoHousePrices(ret, city):
                 db.execute("SELECT * FROM house_prices WHERE `sign`={}".format(i['id']))
                 res = db.fetchall()
                 if (len(res) == 0):
+                    if (i['unit_price'] is None):
+                        i['unit_price'] = 0
                     sql = "INSERT INTO house_prices (`type`, `name`, `city_id`, `city_name`, `sign`, `baidu_lng`, `baidu_lat`, `unit_price`, `count`, `created_at`, `updated_at`) values (1, '{}', {}, '{}', {}, '{}', '{}', {}, {}, '{}', '{}')"
                     sql = sql.format(i['name'], city['id'], city['name'], i['id'], i['longitude'], i['latitude'], i['unit_price'], i['count'], now, now)
                     db.execute(sql)
@@ -114,10 +116,11 @@ def changeBaiduToGaode():
 
     count = 0
     for i in res:
+        print(i['name'])
         location = GD.getGaodeLocation(i['baidu_lat'], i['baidu_lng'])
         locationList = location.split(',')
 
-        with DB() as db:
+        with DB(host=host, user=user, passwd=passwd, db=database) as db:
             sql = "UPDATE house_prices SET gaode_lng='{}', gaode_lat='{}' WHERE id={}"
             sql = sql.format(locationList[0], locationList[1], i['id'])
             db.execute(sql)

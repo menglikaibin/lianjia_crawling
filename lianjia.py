@@ -81,7 +81,7 @@ class Lianjia():
             else:
                 return None
 
-    def getBizcircleInfo(self, max_lat, min_lat, max_lng, min_lng):
+    def getBizcircleInfo(self, max_lat, min_lat, max_lng, min_lng, proxies=''):
         time_13 = int(round(time.time() * 1000))
         authorization = Lianjia(self.city).GetAuthorization(
             {
@@ -108,7 +108,7 @@ class Lianjia():
         )
 
         with requests.Session() as sess:
-            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies, proxies=self.proxies)
+            ret = sess.get(url=url, headers=self.headers, cookies=self.cookies, proxies=proxies)
 
             house_json = json.loads(ret.text[43:-1])
 
@@ -174,6 +174,7 @@ def saveDistrictBorderIntoDB(city):
 def saveBizcircleIntoDB(city):
     areaList = DB.getDistricts(city)
     cityInfo = DB.getCityInfo(city)
+    proxies = params.proxies
 
     for x in areaList:
         print(x['name'])
@@ -191,7 +192,7 @@ def saveBizcircleIntoDB(city):
 
         for x in pbar:
             try:
-                ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3])
+                ret = Lianjia(city).getBizcircleInfo(x[0], x[1], x[2], x[3], proxies)
                 time.sleep(0.1)
                 DB.insertIntoHousePrices(ret, cityInfo)
             except:
